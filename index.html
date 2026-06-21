@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qualia tailoring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Serif+JP:wght@200;300;400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0804;
+    --paper: #f5f0e8;
+    --gold: #b8924a;
+    --gold-light: #d4a96a;
+    --smoke: #9a9490;
+    --cream: #ede8dc;
+    --deep: #1a1410;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 200;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    mix-blend-mode: multiply;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 32px; height: 32px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.35s cubic-bezier(0.23,1,0.32,1), opacity 0.3s;
+    transform: translate(-12px, -12px);
+    opacity: 0.6;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9997;
+    opacity: 0.6;
+  }
+
+  /* Nav */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 3rem;
+    mix-blend-mode: multiply;
+  }
+
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    color: var(--ink);
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--smoke);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  .nav-links a:hover { color: var(--gold); }
+
+  /* Hero */
+  #hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 8rem 3rem 4rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp 1s 0.3s forwards;
+  }
+
+  .hero-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(4rem, 8vw, 7rem);
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    opacity: 0;
+    animation: fadeUp 1s 0.5s forwards;
+  }
+
+  .hero-name em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-tagline {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.8rem;
+    font-weight: 200;
+    color: var(--smoke);
+    margin-top: 2rem;
+    line-height: 2;
+    max-width: 28ch;
+    opacity: 0;
+    animation: fadeUp 1s 0.7s forwards;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 3rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold);
+    padding-bottom: 0.5rem;
+    opacity: 0;
+    animation: fadeUp 1s 0.9s forwards;
+    transition: color 0.3s, gap 0.3s;
+  }
+
+  .hero-cta:hover { color: var(--gold); gap: 1.5rem; }
+
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-visual {
+    position: absolute;
+    inset: 0;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeIn 1.5s 0.2s forwards;
+  }
+
+  .hero-geometric {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .geo-circle {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid var(--gold);
+    opacity: 0.3;
+  }
+
+  .geo-circle:nth-child(1) {
+    width: 60vmin; height: 60vmin;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: rotateSlow 30s linear infinite;
+  }
+
+  .geo-circle:nth-child(2) {
+    width: 40vmin; height: 40vmin;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: rotateSlow 20s linear infinite reverse;
+    opacity: 0.15;
+  }
+
+  .hero-initial {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(8rem, 10vw, 16rem);
+    font-weight: 100;
+    font-style: italic;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--gold);
+    opacity: 0.2;
+    user-select: none;
+    animation: fadeIn 2s 0.5s forwards;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 3rem;
+    right: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--smoke);
+    opacity: 0;
+    animation: fadeIn 1s 1.5s forwards;
+    writing-mode: vertical-rl;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 3rem;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scrollDown 2s ease-in-out infinite;
+  }
+
+  /* Section base */
+  section {
+    padding: 8rem 3rem;
+    position: relative;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 4rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-label::after {
+    content: '';
+    display: block;
+    height: 1px;
+    width: 4rem;
+    background: var(--gold);
+    opacity: 0.4;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+
+  /* About */
+  #about {
+    background: var(--deep);
+    color: var(--paper);
+  }
+
+  #about .section-label { color: var(--gold); }
+
+  #about .section-title { color: var(--paper); }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: start;
+    max-width: 1100px;
+  }
+
+  .about-text {
+    font-size: 0.9rem;
+    line-height: 2.2;
+    color: rgba(245,240,232,0.7);
+  }
+
+  .about-text p + p { margin-top: 1.5rem; }
+
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .stat-item {
+    border-top: 1px solid rgba(184,146,74,0.3);
+    padding-top: 1.5rem;
+  }
+
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3rem;
+    font-weight: 300;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--smoke);
+    margin-top: 0.5rem;
+  }
+
+  /* Timeline */
+  #career {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 8rem 3rem;
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 3rem;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.5rem;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    opacity: 0.3;
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-bottom: 3.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s, transform 0.7s;
+  }
+
+  .timeline-item.visible { opacity: 1; transform: none; }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -3rem;
+    top: 0.4rem;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 0 3px var(--paper), 0 0 0 4px var(--gold);
+  }
+
+  .timeline-year {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+
+  .timeline-role {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+  }
+
+  .timeline-org {
+    font-size: 0.75rem;
+    color: var(--smoke);
+    margin-bottom: 0.75rem;
+    font-weight: 300;
+  }
+
+  .timeline-desc {
+    font-size: 0.8rem;
+    line-height: 2;
+    color: rgba(10,8,4,0.65);
+    max-width: 55ch;
+  }
+
+  /* Services */
+  #services {
+    background: var(--cream);
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--gold);
+    border: 1px solid var(--gold);
+    max-width: 1100px;
+    margin-top: 4rem;
+  }
+
+  .service-card {
+    background: var(--cream);
+    padding: 3rem 2.5rem;
+    transition: background 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .service-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transition: transform 0.4s;
+    transform-origin: left;
+  }
+
+  .service-card:hover { background: var(--deep); }
+  .service-card:hover .service-title { color: var(--paper); }
+  .service-card:hover .service-desc { color: rgba(245,240,232,0.6); }
+  .service-card:hover .service-num { color: rgba(184,146,74,0.3); }
+  .service-card:hover::after { transform: scaleX(1); }
+
+  .service-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 4rem;
+    font-weight: 300;
+    color: rgba(10,8,4,0.06);
+    line-height: 1;
+    margin-bottom: 1.5rem;
+    transition: color 0.4s;
+  }
+
+  .service-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 1rem;
+    transition: color 0.4s;
+  }
+
+  .service-desc {
+    font-size: 0.75rem;
+    line-height: 2;
+    color: var(--smoke);
+    transition: color 0.4s;
+  }
+
+  .service-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 1.5rem;
+  }
+
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid rgba(184,146,74,0.3);
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  /* Portfolio */
+  #portfolio {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 8rem 3rem;
+  }
+
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 4rem;
+  }
+
+  .portfolio-item {
+    border: 1px solid rgba(10,8,4,0.1);
+    padding: 2.5rem;
+    position: relative;
+    transition: border-color 0.3s;
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  .portfolio-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--deep);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.5s cubic-bezier(0.23,1,0.32,1);
+    z-index: 0;
+  }
+
+  .portfolio-item:hover::before { transform: scaleY(1); }
+  .portfolio-item:hover .p-title,
+  .portfolio-item:hover .p-desc,
+  .portfolio-item:hover .p-cat { color: var(--paper); opacity: 1; }
+  .portfolio-item:hover .p-cat { color: var(--gold-light); }
+
+  .portfolio-item > * { position: relative; z-index: 1; }
+
+  .p-cat {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    transition: color 0.3s;
+  }
+
+  .p-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 0.75rem;
+    transition: color 0.3s;
+    line-height: 1.3;
+  }
+
+  .p-desc {
+    font-size: 0.75rem;
+    line-height: 1.9;
+    color: var(--smoke);
+    transition: color 0.3s;
+  }
+
+  /* Maison Qualia */
+  #maison {
+    background: var(--ink);
+    color: var(--paper);
+    text-align: center;
+    padding: 10rem 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mq-bg {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .mq-bg-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(6rem, 18vw, 18rem);
+    font-weight: 300;
+    font-style: italic;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(184,146,74,0.12);
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .mq-content {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  #maison .section-label {
+    justify-content: center;
+  }
+
+  #maison .section-title {
+    color: var(--paper);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-style: italic;
+  }
+
+  .mq-desc {
+    font-size: 0.85rem;
+    line-height: 2.3;
+    color: rgba(245,240,232,0.6);
+    margin-top: 2rem;
+  }
+
+  .mq-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 3rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    border: 1px solid rgba(184,146,74,0.4);
+    padding: 1rem 2rem;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  .mq-link:hover {
+    background: var(--gold);
+    color: var(--ink);
+  }
+
+  /* Blog */
+  #blog {
+    padding: 8rem 3rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 4rem;
+  }
+
+  .blog-item {
+    border-top: 1px solid rgba(10,8,4,0.15);
+    padding-top: 1.5rem;
+    transition: border-color 0.3s;
+    cursor: pointer;
+  }
+
+  .blog-item:hover { border-color: var(--gold); }
+
+  .blog-item.featured {
+    grid-row: span 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background: var(--cream);
+    padding: 2.5rem;
+    border: none;
+  }
+
+  .blog-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+
+  .blog-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .blog-item.featured .blog-title {
+    font-size: 1.6rem;
+  }
+
+  .blog-excerpt {
+    font-size: 0.75rem;
+    line-height: 1.9;
+    color: var(--smoke);
+    margin-top: 0.75rem;
+  }
+
+  /* Contact */
+  #contact {
+    background: var(--cream);
+    padding: 8rem 3rem;
+  }
+
+  .contact-inner {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .contact-intro {
+    font-size: 0.85rem;
+    line-height: 2.2;
+    color: var(--smoke);
+    margin-bottom: 3rem;
+  }
+
+  .form-group {
+    margin-bottom: 2rem;
+  }
+
+  .form-label {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--smoke);
+    margin-bottom: 0.75rem;
+  }
+
+  .form-input,
+  .form-textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(10,8,4,0.2);
+    padding: 0.75rem 0;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.9rem;
+    font-weight: 200;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .form-input:focus,
+  .form-textarea:focus { border-color: var(--gold); }
+
+  .form-textarea { resize: none; height: 120px; }
+
+  .form-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 1.2rem 3rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    cursor: none;
+    transition: background 0.3s, gap 0.3s;
+    margin-top: 1rem;
+  }
+
+  .form-submit:hover { background: var(--gold); gap: 1.5rem; }
+
+  /* Footer */
+  footer {
+    padding: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(10,8,4,0.1);
+  }
+
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  .footer-copy {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    color: var(--smoke);
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes rotateSlow {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  @keyframes scrollDown {
+    0%,100% { opacity: 1; transform: scaleY(1); }
+    50% { opacity: 0.3; transform: scaleY(0.5); }
+  }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.23,1,0.32,1), transform 0.8s cubic-bezier(0.23,1,0.32,1);
+  }
+
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    #hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .services-grid { grid-template-columns: 1fr; }
+    .portfolio-grid { grid-template-columns: 1fr; }
+    .blog-grid { grid-template-columns: 1fr; }
+    nav { padding: 1.5rem 2rem; }
+    section { padding: 5rem 2rem; }
+    .hero-left { padding: 7rem 2rem 4rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <a href="#" class="nav-logo">Qualia tailoring</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#portfolio">Works</a></li>
+    <li><a href="#maison">Maison Qualia</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section id="hero">
+  <div class="hero-left">
+    <p class="hero-eyebrow">Consultant & engineering — Tokyo</p>
+    <h1 class="hero-name">感覚を<br><em>仕立てる</em></h1>
+    <p class="hero-tagline">経営戦略・DX推進・アプリ開発<br>言語化が難しい抽象的な課題を複数の領域の知見から<br>事業の本質的な価値を高める</p>
+    <a href="#services" class="hero-cta">サービスを見る &rarr;</a>
+  </div>
+  <div class="hero-right">
+    <div class="hero-visual">
+      <div class="hero-geometric">
+        <div class="geo-circle"></div>
+        <div class="geo-circle"></div>
+      </div>
+      <span class="hero-initial">Qualia<br>tailoring</span>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- About -->
+<section id="about">
+  <div class="section-label">01 — About</div>
+  <div class="about-grid">
+    <div>
+      <h2 class="section-title reveal">Vision</h2>
+      <div class="about-text reveal">
+        <p>感覚を仕立てる</p>
+        <p>IT・経営コンサルティングから、DX推進、事業計画や業務品質の改善——事業の課題を構造的に捉え、運用まで落とし込む。</p>
+        <p>ITとオーダースーツ業界で用いられる「テーラリング」に通じる当社が、「あなたの感覚」を仕立てします</p>
+      </div>
+    </div>
+    <div class="about-stats reveal">
+      <div class="stat-item">
+        <div class="stat-num">30↑</div>
+        <div class="stat-label">参画プロジェクト数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">5,000h↑</div>
+        <div class="stat-label">累計年間業務削減時間</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">50↑</div>
+        <div class="stat-label">開発アプリ数</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">2023</div>
+        <div class="stat-label">since</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Services -->
+<section id="services">
+  <div class="section-label reveal">02 — Services</div>
+  <h2 class="section-title reveal">Domain</h2>
+  <div class="services-grid reveal">
+    <div class="service-card">
+      <div class="service-num">01</div>
+      <div class="service-title">経営・事業戦略</div>
+      <div class="service-desc">新規事業立案からM&A戦略まで、事業の成長を構造的に設計します。市場分析、競合調査、ビジネスモデル設計を一貫して支援。</div>
+      <div class="service-tags">
+        <span class="tag">新規事業</span>
+        <span class="tag">M&A</span>
+        <span class="tag">BPR</span>
+      </div>
+    </div>
+    <div class="service-card">
+      <div class="service-num">02</div>
+      <div class="service-title">ITシステム開発</div>
+      <div class="service-desc">要件定義から実装まで。FileMaker・Bubble・Next.jsなど多様な技術スタックで、現場に刺さるシステムを構築します。</div>
+      <div class="service-tags">
+        <span class="tag">DX推進</span>
+        <span class="tag">Webアプリ</span>
+        <span class="tag">AI活用</span>
+      </div>
+    </div>
+    <div class="service-card">
+      <div class="service-num">03</div>
+      <div class="service-title">案件推進</div>
+      <div class="service-desc">プロジェクトの立ち上げから推進・運用定着まで。社内承認、ステークホルダー調整、スケジュール管理、リスクハンドリングの支援を行います。</div>
+      <div class="service-tags">
+        <span class="tag">PM</span>
+        <span class="tag">PMO</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Career -->
+<section id="career">
+  <div class="section-label">03 — Career</div>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-year"></div>
+      <div class="timeline-role">Founder & CEO</div>
+      <div class="timeline-org">IT Services</div>
+      <div class="timeline-desc">3PL向けWMS構築、OCRの読取りシステム、AI×ファッションのODM型受注生産プラットフォームを構築</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year"></div>
+      <div class="timeline-role">Independent Consultant</div>
+      <div class="timeline-org">BPO-BPR / DX / Business Strategy</div>
+      <div class="timeline-desc">システム開発・BPR・社内セキュリティなど多領域のコンサルティングを展開。バックオフィスの業務改善の設計やアプリ開発、運用定着までの伴走も行う</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year"></div>
+      <div class="timeline-role">Senior Consultant</div>
+      <div class="timeline-org">BPR / DX / Business Strategy</div>
+      <div class="timeline-desc">大手証券・通信業界等のクライアントへの経営・IT戦略コンサルティングに従事。<br>
+        コールセンターのシステム基盤リプレース、DX推進、業務改善のPM/PMO等の様々なステークホルダーマネジメントを経験。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year"></div>
+      <div class="timeline-role">Merchandiser</div>
+      <div class="timeline-org">—</div>
+      <div class="timeline-desc">大手ブライダル会社の商品部門のMDとして、国内外の仕入開発、予算管理、事業計画の策定から実行まで経験</div>
+    </div>
+  </div>
+</section>
+
+<!-- Portfolio -->
+<section id="portfolio">
+  <div class="section-label">04 — Selected Works</div>
+  <h2 class="section-title reveal">実績</h2>
+  <div class="portfolio-grid reveal">
+    <div class="portfolio-item">
+      <div class="p-cat">IT / DX</div>
+      <div class="p-title">3PL向け WMS システム開発</div>
+      <div class="p-desc">通常のWMSでは対応不可能である特殊な倉庫管理システムの設計・実装。<br>
+        フロント/バックエンドをノーコードツール、Pythonと分けることで開発・運用コストを抑えて実現</div>
+    </div>
+    <div class="portfolio-item">
+      <div class="p-cat">AI / Product</div>
+      <div class="p-title">AIイラスト精緻化ツール</div>
+      <div class="p-desc">GPT-4o + DALL-E 3を組み合わせた服飾デザイン向け画像リファインツール。Streamlit Cloudで本番運用</div>
+    </div>
+    <div class="portfolio-item" onclick="window.open('https://qualia-tailoring.github.io/Play-equipment-inspection/', '_blank')">
+      <div class="p-cat">DX</div>
+      <div class="p-title">遊具点検報告アプリ</div>
+      <div class="p-desc">建設業会で紙で報告されていた、現場も管理も手間な報告書をスマホからの簡単操作と効率化を実現した業務アプリ</div>
+      <div class="p-desc">クリック頂くとサンプルページへ遷移します</div>
+    </div>
+    <div class="portfolio-item">
+      <div class="p-cat">AI / IT</div>
+      <div class="p-title">HR業務OCRツール</div>
+      <div class="p-desc">コストに応じて生成AI/API切り替え可能なHR向け書類を写真撮影だけで必要情報のデジタル化システム。OCR比較評価の結果、開発・実装支援までを担当</div>
+    </div>
+  </div>
+</section>
+
+<!-- Maison Qualia -->
+<section id="maison">
+  <div class="mq-bg">
+    <div class="mq-bg-text">Maison Qualia</div>
+  </div>
+  <div class="mq-content">
+    <div class="section-label" style="justify-content:center;">05 — Brand</div>
+    <h2 class="section-title reveal"><em>Maison Qualia</em></h2>
+    <p class="mq-desc reveal">AIとクリエイターで実現させる、新しい服の在り方を探求するファッションプラットフォーム。<br>
+      生成デザインから実物のガーメントへ——受注生産の仕組みで、世界のどこにもない一着を届けます。</p>
+    <a href="https://maison-qualia.com/" class="mq-link reveal">Maison Qualia を見る &rarr;</a>
+  </div>
+</section>
+
+<!-- Blog -->
+<section id="blog">
+  <div class="section-label">06 — Insights</div>
+  <h2 class="section-title reveal">発信</h2>
+  <div class="blog-grid reveal">
+
+    <div class="blog-item featured">
+      <div class="blog-date"></div>
+      <div class="blog-title"><a href="https://note.com/lithe_vole391">月60時間の社労士連携業務を1時間にした話 ― ミスまで減らした”全部自動化しない”設計</a></div>
+      <div class="blog-excerpt">給与管理の業務改善に関する話</div>
+    </div>
+
+    <div class="blog-item">
+      <div class="blog-date">yyyy.mm</div>
+      <div class="blog-title">noteにて随時更新予定</div>
+    </div>
+    <div class="blog-item">
+      <div class="blog-date">yyyy.mm</div>
+      <div class="blog-title">noteにて随時更新予定</div>
+    </div>
+    <div class="blog-item">
+      <div class="blog-date">yyyy.mm</div>
+      <div class="blog-title">noteにて随時更新予定</div>
+    </div>
+    <div class="blog-item">
+      <div class="blog-date">yyyy.mm</div>
+      <div class="blog-title">noteにて随時更新予定</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Contact -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="section-label reveal">07 — Contact</div>
+    <h2 class="section-title reveal">お問い合わせ</h2>
+    <p class="contact-intro reveal">案件のご相談、コラボレーションのご提案、まずは気軽にメッセージをお送りください。</p>
+    <iframe src="https://forms.gle/rQWkn4QDZec7jEoa8" 
+    width="100%" height="600" frameborder="0">
+    </iframe>
+
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">Qualia tailoring</div>
+  <div class="footer-copy">&copy; 2026 Qualia tailoring All rights reserved.</div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.transform = `translate(${mx - 4}px, ${my - 4}px)`;
+  });
+
+  function animateRing() {
+    rx += (mx - rx - 16) * 0.12;
+    ry += (my - ry - 16) * 0.12;
+    ring.style.transform = `translate(${rx}px, ${ry}px)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button, .portfolio-item, .service-card, .blog-item').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform += ' scale(2)';
+      ring.style.opacity = '0';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.opacity = '0.6';
+    });
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.reveal, .timeline-item').forEach(el => observer.observe(el));
+
+  // Nav hide on scroll
+  let lastY = 0;
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    const y = window.scrollY;
+    if (y > lastY && y > 100) nav.style.opacity = '0';
+    else nav.style.opacity = '1';
+    lastY = y;
+    nav.style.transition = 'opacity 0.4s';
+  });
+</script>
+</body>
+</html>
