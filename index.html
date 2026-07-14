@@ -714,6 +714,49 @@
     margin-top: 0.75rem;
   }
 
+  /* Company */
+  #company {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 8rem 3rem;
+  }
+
+  .company-table {
+    margin-top: 4rem;
+    max-width: 780px;
+    border-top: 1px solid rgba(10,8,4,0.15);
+  }
+
+  .company-row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 2rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(10,8,4,0.1);
+  }
+
+  .company-key {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding-top: 0.25rem;
+  }
+
+  .company-val {
+    font-size: 0.85rem;
+    line-height: 1.9;
+    color: rgba(10,8,4,0.75);
+    font-weight: 300;
+  }
+
+  .company-val a {
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(184,146,74,0.4);
+  }
+
   /* Contact */
   #contact {
     background: var(--cream);
@@ -846,6 +889,7 @@
     .services-grid { grid-template-columns: 1fr; }
     .portfolio-grid { grid-template-columns: 1fr; }
     .blog-grid { grid-template-columns: 1fr; }
+    .company-row { grid-template-columns: 1fr; gap: 0.5rem; }
     nav { padding: 1.5rem 2rem; }
     section { padding: 5rem 2rem; }
     .hero-left { padding: 7rem 2rem 4rem; }
@@ -958,6 +1002,7 @@
     <li><a href="#services">Services</a></li>
     <li><a href="#portfolio">Works</a></li>
     <li><a href="#maison">Maison Qualia</a></li>
+    <li><a href="#company">Company</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
 </nav>
@@ -1164,10 +1209,54 @@
   </div>
 </section>
 
+<!-- Company / 会社概要 -->
+<section id="company">
+  <div class="section-label reveal">07 — Company</div>
+  <h2 class="section-title reveal">会社概要</h2>
+  <div class="company-table reveal">
+    <div class="company-row">
+      <div class="company-key">社名</div>
+      <div class="company-val">クオリアテーラリング Qualia Tailoring</div>
+    </div>
+    <div class="company-row">
+      <div class="company-key">英文表記 / Legal Entity Name</div>
+      <div class="company-val">Qualia Tailoring Co. Ltd</div>
+    </div>
+    <div class="company-row">
+      <div class="company-key">所在地 / Address</div>
+      <div class="company-val">〒106-0061 東京都中央区銀座1-12-4 N&E BLD 7F</div>
+    </div>
+    <div class="company-row">
+      <div class="company-key">設立</div>
+      <div class="company-val">2023年○月<!-- 修正 --></div>
+    </div>
+    <div class="company-row">
+      <div class="company-key">代表者</div>
+      <div class="company-val">代表 ○○ ○○<!-- 修正 --></div>
+    </div>
+    <div class="company-row">
+      <div class="company-key">資本金</div>
+      <div class="company-val">○○○万円<!-- 任意・不要なら行ごと削除 --></div>
+    </div>
+    <div class="company-row">
+      <div class="company-key">事業内容</div>
+      <div class="company-val">ITコンサルティング／DX推進支援／アプリケーション開発／ファッションブランド「Maison Qualia」の企画・運営</div>
+    </div>
+    <div class="company-row">
+      <div class="company-key">Web</div>
+      <div class="company-val"><a href="https://qualia-tailoring.github.io/" target="_blank" rel="noopener">qualia-tailoring.github.io</a><!-- 独自ドメインに修正 --></div>
+    </div>
+    <div class="company-row">
+      <div class="company-key">お問い合わせ</div>
+      <div class="company-val">下記お問い合わせフォーム</div>
+    </div>
+  </div>
+</section>
+
 <!-- Contact -->
 <section id="contact">
   <div class="contact-inner">
-    <div class="section-label reveal">07 — Contact</div>
+    <div class="section-label reveal">08 — Contact</div>
     <h2 class="section-title reveal">お問い合わせ</h2>
     <p class="contact-intro reveal">案件のご相談、コラボレーションのご提案、まずは気軽にメッセージをお送りください。</p>
     <iframe src="https://forms.gle/rQWkn4QDZec7jEoa8" 
